@@ -1,0 +1,36 @@
+{
+	"name": "kivii-component-template",
+	"version": "1.0.0",
+	"description": "组件开发启动模板",
+	"keywords": [],
+	"author": "Kivii & Wemt Team",
+	"license": "MIT",
+	"type": "module",
+	"scripts": {
+		"dev": "vite",
+		"build": "vite build && node scripts/validate-umd.mjs",
+		"preview": "vite preview",
+		"type-check": "vue-tsc --noEmit",
+		"validate:umd": "node scripts/validate-umd.mjs"
+	},
+	"devDependencies": {
+		"@vitejs/plugin-vue": "^5.0.0",
+		"autoprefixer": "^10.4.27",
+		"postcss": "^8.5.6",
+		"tailwindcss": "^3.4.19",
+		"terser": "^5.0.0",
+		"typescript": "^5.0.0",
+		"vite": "^5.0.0",
+		"vite-plugin-css-injected-by-js": "^4.0.1",
+		"vue": "^3.4.0",
+		"vue-tsc": "^2.0.0"
+	},
+	"peerDependencies": {
+		"vue": "^3.0.0"
+	},
+	"dependencies": {
+		"@kivii.com/bridge": "^1.1.11",
+		"echarts": "^6.0.0"
+	},
+	"packageManager": "pnpm@10.28.1+sha1.20817ab95fb7f61154ba5ff3bcb61f27defb6142"
+}
