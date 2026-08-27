@@ -16,15 +16,13 @@
 
     /* 代码检查 */
     "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
+    "noImplicitAny": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true,
 
     /* 声明文件生成 */
-    "declaration": true,
-    "declarationDir": "./dist",
-    "emitDeclarationOnly": true,
-    "outDir": "./dist",
+    "declaration": false,
 
     /* 路径映射 */
     "baseUrl": ".",

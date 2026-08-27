@@ -4,14 +4,14 @@
 import "./style.css";
 import type { App, Component, ComponentPublicInstance } from "vue";
 import { h, defineComponent, ref } from "vue";
-import { UmdIntegrationTest as _UmdIntegrationTest } from "@/build/components";
+import { TableIndex as _TableIndex } from "@/build/components";
 import projectConfig from "../project.config.js";
 
 // 组件类型定义（只有需要传递参数的组件才需要定义类型）
-export type { Props as UmdIntegrationTestProps } from "@/build/components/UmdIntegrationTest.vue";
+export type { Props as TableIndexProps } from "@/build/components/tablefield/TableIndex.vue";
 
 // 导出组件
-export { UmdIntegrationTest, install };
+export { TableIndex, install };
 
 // 组件列表
 /**
@@ -46,10 +46,10 @@ const withWrapper = (
     },
   });
 
-const UmdIntegrationTest = withWrapper(_UmdIntegrationTest);
+const TableIndex = withWrapper(_TableIndex);
 
 const components = {
-  UmdIntegrationTest,
+  TableIndex,
 };
 
 // 定义安装函数
@@ -72,10 +72,10 @@ export const manifest = {
   description: projectConfig.description,
   components: Object.keys(components),
   componentsMap: {
-    UmdIntegrationTest: "Test module for verifying UMD loading, event forwarding, and theme switching.",
+    TableIndex: "可配置的 Kivii 数据表格，包含查询、列设置、操作与动态表单。",
   },
   componentsDetailed: [
-    { name: "UmdIntegrationTest", zhName: "UMD 集成测试", icon: "fas fa-vial", description: "Test module for verifying UMD loading, event forwarding, and theme switching." },
+    { name: "TableIndex", zhName: "动态表格", icon: "fas fa-table", description: "可配置的 Kivii 数据表格，包含查询、列设置、操作与动态表单。" },
   ],
 };
 

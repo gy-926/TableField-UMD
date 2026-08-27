@@ -1,5 +1,5 @@
 {
-	"name": "kivii-component-template",
+	"name": "kivii-tablefield-umd",
 	"version": "1.0.0",
 	"description": "组件开发启动模板",
 	"keywords": [],
@@ -22,6 +22,7 @@
 		"typescript": "^5.0.0",
 		"vite": "^5.0.0",
 		"vite-plugin-css-injected-by-js": "^4.0.1",
+		"unplugin-vue-components": "^30.0.0",
 		"vue": "^3.4.0",
 		"vue-tsc": "^2.0.0"
 	},
@@ -30,7 +31,10 @@
 	},
 	"dependencies": {
 		"@kivii.com/bridge": "^1.1.11",
-		"echarts": "^6.0.0"
+		"axios": "^1.15.0",
+		"echarts": "^6.0.0",
+		"naive-ui": "^2.44.1",
+		"vue3-sfc-loader": "^0.9.5"
 	},
 	"packageManager": "pnpm@10.28.1+sha1.20817ab95fb7f61154ba5ff3bcb61f27defb6142"
 }

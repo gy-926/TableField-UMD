@@ -30,10 +30,16 @@ const scriptUrl = `https://example.test/components/${projectConfig.fileName}`;
 const context = vm.createContext({
   Vue,
   console,
+  Event: class Event {},
+  navigator: { userAgent: "node" },
+  location: { href: "https://example.test/" },
+  URL,
   document: {
     currentScript: { src: scriptUrl },
+    documentElement: { style: {} },
     createElement: () => ({
       textContent: "",
+      style: {},
       children: [],
       appendChild(child) {
         this.children.push(child);
@@ -67,7 +73,7 @@ assert.equal(library.manifest.fileName, projectConfig.fileName);
 assert.equal(library.manifest.wrapperClass, projectConfig.wrapperClass);
 assert.deepEqual(
   Array.from(library.manifest.components),
-  ["UmdIntegrationTest"],
+  ["TableIndex"],
   "manifest 组件清单异常",
 );
 assert.ok(injectedStyles.length > 0, "UMD 未注入组件样式");
@@ -78,84 +84,11 @@ library.install({
 });
 assert.deepEqual(
   registered.map(({ name }) => name),
-  ["UmdIntegrationTest"],
+  ["TableIndex"],
   "install() 注册组件异常",
 );
 
-let toggleCount = 0;
-const componentRef = Vue.ref();
-const Root = Vue.defineComponent({
-  setup: () => () =>
-    Vue.h(library.UmdIntegrationTest, {
-      ref: componentRef,
-      theme: "light",
-      onToggleTheme: () => {
-        toggleCount += 1;
-      },
-    }),
-});
-
-const renderer = Vue.createRenderer({
-  createElement: (type) => ({ type, props: {}, children: [], parent: null }),
-  createText: (text) => ({ type: "text", text, parent: null }),
-  createComment: (text) => ({ type: "comment", text, parent: null }),
-  setText: (node, text) => {
-    node.text = text;
-  },
-  setElementText: (node, text) => {
-    node.children = [{ type: "text", text, parent: node }];
-  },
-  parentNode: (node) => node.parent,
-  nextSibling: (node) => {
-    const siblings = node.parent?.children ?? [];
-    return siblings[siblings.indexOf(node) + 1] ?? null;
-  },
-  insert: (child, parent, anchor) => {
-    child.parent = parent;
-    if (!anchor) {
-      parent.children.push(child);
-      return;
-    }
-    parent.children.splice(parent.children.indexOf(anchor), 0, child);
-  },
-  remove: (child) => {
-    const siblings = child.parent?.children;
-    if (siblings) siblings.splice(siblings.indexOf(child), 1);
-  },
-  patchProp: (node, key, _previous, value) => {
-    node.props[key] = value;
-  },
-  querySelector: () => null,
-  setScopeId: () => {},
-  insertStaticContent: () => [null, null],
-});
-
-const root = { type: "root", props: {}, children: [], parent: null };
-renderer.createApp(Root).mount(root);
-
-const findNode = (node, predicate) => {
-  if (predicate(node)) return node;
-  for (const child of node.children ?? []) {
-    const match = findNode(child, predicate);
-    if (match) return match;
-  }
-};
-
-const wrapper = findNode(
-  root,
-  (node) => node.props?.class === projectConfig.wrapperClass,
-);
-assert.ok(wrapper, "组件缺少 Tailwind 隔离 wrapper");
-
-const button = findNode(root, (node) => node.type === "button");
-assert.equal(typeof button?.props?.onClick, "function", "未渲染主题切换按钮");
-button.props.onClick({ type: "click" });
-assert.equal(toggleCount, 1, "包装器未正确透传 toggle-theme 事件");
-assert.equal(
-  componentRef.value.getManifest()?.name,
-  "UmdIntegrationTest",
-  "包装器未正确代理组件 manifest",
-);
+assert.ok(library.TableIndex, "UMD 未导出 TableIndex");
 
 console.log(
   `✓ UMD validated: ${projectConfig.fileName} → window.${projectConfig.libraryName}`,

@@ -2,6 +2,8 @@ import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
 import { resolve } from "path";
 import cssInjectedByJs from "vite-plugin-css-injected-by-js";
+import Components from "unplugin-vue-components/vite";
+import { NaiveUiResolver } from "unplugin-vue-components/resolvers";
 import projectConfig from "./project.config.js";
 
 const registryFooter = `
@@ -26,7 +28,11 @@ const registryFooter = `
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [vue(), cssInjectedByJs()],
+  plugins: [
+    vue(),
+    Components({ dts: "src/types/components.d.ts", resolvers: [NaiveUiResolver()] }),
+    cssInjectedByJs(),
+  ],
   build: {
     // 输出目录
     outDir: resolve(__dirname, "./dist"),

@@ -5,11 +5,11 @@
  * Tailwind 隔离类名和运行时 manifest 都会同步更新。
  */
 export default Object.freeze({
-  libraryName: "vueComponent3",
-  fileName: "vue-component-test.umd.js",
-  wrapperClass: "vue-component-test-wrapper",
-  displayName: "Vue UMD 集成测试组件",
-  description: "用于验证主项目动态加载、注册和调用 Vue UMD 组件的测试包。",
-  author: "Kivii UMD Team",
-  version: "0.1.0",
+  libraryName: "KiviiTableField",
+  fileName: "kivii-tablefield.umd.js",
+  wrapperClass: "kivii-tablefield-umd-wrapper",
+  displayName: "Kivii 动态表格",
+  description: "从 kivii-public-components 独立交付的动态表格 UMD 模块。",
+  author: "Kivii Team",
+  version: "1.0.0",
 });

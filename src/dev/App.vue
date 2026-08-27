@@ -1,6 +1,6 @@
 <template>
   <div>
-    <UmdIntegrationTestDemo />
+    <TableIndexDemo />
   </div>
 </template>
 
@@ -8,5 +8,5 @@
 /**
  * 尚未集成路由系统，请通过组件引入方式进行预览
  */
-import UmdIntegrationTestDemo from '@/dev/views/UmdIntegrationTestDemo.vue';
+import TableIndexDemo from '@/dev/views/UmdIntegrationTestDemo.vue';
 </script>
