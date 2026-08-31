@@ -541,7 +541,7 @@ const settings = ref({});
 const handleGetSettings = async () => {
   try {
     // 在请求前检查必要的配置参数
-    if (mockMode.value || !uiConfig.GetUrl || !uiConfig.Type) {
+    if (!mockMode.value && (!uiConfig.GetUrl || !uiConfig.Type)) {
       //console.log('📋 缺少必要的配置参数，无法获取配置，需要调用字段匹配接口');
 
       // 即使没有配置，也初始化一个默认视图
