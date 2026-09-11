@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, h, inject, onMounted, ref, watch } from 'vue';
+import { computed, h, inject, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 import axios, { type AxiosInstance } from 'axios';
 import { useMessage, useDialog } from 'naive-ui';
 
@@ -20,8 +20,49 @@ const primaryColor = inject<ReturnType<typeof ref<string>>>('primaryColor', ref(
 
 // 固定列背景色：跟随宿主主题自动切换
 // 亮色使用 #ffffff，暗色使用 NaiveUI dark theme 对应的卡片背景色
-const fixedCellBg = computed(() => (isDark.value ? '#1a1a1a' : '#ffffff'));
-const fixedHeaderBg = computed(() => (isDark.value ? '#1f1f1f' : '#fafafa'));
+const fixedCellBg = computed(() => (isDark.value ? '#182235' : '#ffffff'));
+const fixedHeaderBg = computed(() => (isDark.value ? '#202c40' : '#f5f7fa'));
+
+// 表格主体自动占满当前页面剩余高度。
+// 由于 UMD 在不同宿主中的顶部导航高度不固定，这里根据卡片的实际位置计算，
+// 不使用写死的 calc(100vh - xxx) 常量。
+const tableCardRef = ref<any>(null);
+const adaptiveTableHeight = ref(360);
+let layoutResizeObserver: ResizeObserver | null = null;
+let resizeFrame = 0;
+
+const updateAdaptiveTableHeight = () => {
+  window.cancelAnimationFrame(resizeFrame);
+  resizeFrame = window.requestAnimationFrame(() => {
+    const cardElement = tableCardRef.value?.$el as HTMLElement | undefined;
+    if (!cardElement) return;
+
+    const cardTop = cardElement.getBoundingClientRect().top;
+    const headerHeight = cardElement.querySelector<HTMLElement>('.n-data-table-thead')?.offsetHeight || 40;
+    const paginationElement = cardElement.querySelector<HTMLElement>('.n-data-table__pagination');
+    const paginationHeight = paginationElement
+      ? paginationElement.offsetHeight + 24
+      : 10;
+    const viewportHeight = window.visualViewport?.height || window.innerHeight;
+    // 百分比高度在部分 UMD 挂载链路中会退化为内容高度，因此不能读取
+    // table-container 的 bottom。优先读取宿主页面承载层的真实可视边界，
+    // 兼容旧版 UMD 容器和新版 PageHost；其他宿主则回退到浏览器视口。
+    const hostContainer = cardElement.closest<HTMLElement>(
+      '.umd-component-page, .page-host-umd-container'
+    );
+    const hostBottom = hostContainer?.getBoundingClientRect().bottom;
+    const availableBottom = hostBottom && hostBottom > cardTop
+      ? Math.min(viewportHeight, hostBottom)
+      : viewportHeight;
+    const pageBottomGap = 24;
+    const cardBottomPadding = 10;
+    const availableHeight = Math.floor(
+      availableBottom - cardTop - headerHeight - paginationHeight - pageBottomGap - cardBottomPadding
+    );
+
+    adaptiveTableHeight.value = Math.max(160, availableHeight);
+  });
+};
 
 const {
   tableData,
@@ -118,7 +159,25 @@ const handleSelectionChange = (rowKeys: any) => {
 
 // 组件挂载后检查数据
 onMounted(() => {
-  // 初始化完成
+  nextTick(() => {
+    updateAdaptiveTableHeight();
+
+    const cardElement = tableCardRef.value?.$el as HTMLElement | undefined;
+    const layoutContainer = cardElement?.closest('.table-container');
+    layoutResizeObserver = new ResizeObserver(updateAdaptiveTableHeight);
+    if (cardElement) layoutResizeObserver.observe(cardElement);
+    if (layoutContainer) layoutResizeObserver.observe(layoutContainer);
+    window.addEventListener('resize', updateAdaptiveTableHeight);
+    window.visualViewport?.addEventListener('resize', updateAdaptiveTableHeight);
+  });
+});
+
+onUnmounted(() => {
+  layoutResizeObserver?.disconnect();
+  layoutResizeObserver = null;
+  window.cancelAnimationFrame(resizeFrame);
+  window.removeEventListener('resize', updateAdaptiveTableHeight);
+  window.visualViewport?.removeEventListener('resize', updateAdaptiveTableHeight);
 });
 
 // 创建标签渲染函数
@@ -443,13 +502,14 @@ function getTagColor(type: string) {
 </script>
 
 <template>
-  <NCard class="search-card" :bordered="false" content-style="padding: 0 12px 8px;margin-top:10px">
+  <NCard ref="tableCardRef" class="table-card" :bordered="true" content-style="padding: 0 0 10px;">
     <NDataTable ref="table" v-model:checked-row-keys="checkedRowKeys" remote :columns="processedColumns"
       :data="tableData" :loading="loading" :pagination="{
         ...pagination,
         onChange: handlePageChange,
         onUpdatePageSize: handlePageSizeChange
-      }" :row-key="row => row.Kvid" :max-height="tableHeight" :scroll-x="tableScrollWidth" :single-line="!showBorder"
+      }" :row-key="row => row.Kvid" :min-height="adaptiveTableHeight" :max-height="adaptiveTableHeight"
+      :scroll-x="tableScrollWidth" :single-line="!showBorder"
       :striped="showStripe" :size="tableSize" @update:sorter="handleSorterChange" @update:filters="handleFiltersChange"
       @update:checked-row-keys="handleSelectionChange">
       <template #loading>
@@ -471,8 +531,12 @@ function getTagColor(type: string) {
 </template>
 
 <style scoped>
-.search-card {
-  margin-bottom: 8px;
+.table-card {
+  margin-bottom: 0;
+  overflow: hidden;
+  border-radius: 1rem;
+  border-color: var(--kivii-table-border);
+  background: var(--kivii-table-surface);
 }
 
 .tag-container {
@@ -497,14 +561,23 @@ function getTagColor(type: string) {
 }
 
 :deep(.n-data-table) {
-  --n-merged-th-color: var(--n-table-color);
-  --n-merged-td-color: var(--n-table-color);
-  --n-table-color: var(--n-card-color);
-  --n-table-header-color: var(--n-card-color);
-  --n-table-color-hover: var(--n-color-target);
-  --n-table-color-striped: var(--n-color-target);
-  --n-table-color-dark: #2d2d2d;
-  --n-table-header-color-dark: #333333;
+  --n-merged-th-color: var(--kivii-table-header-bg);
+  --n-merged-td-color: var(--kivii-table-surface);
+  --n-table-color: var(--kivii-table-surface);
+  --n-table-header-color: var(--kivii-table-header-bg);
+  --n-table-color-hover: var(--kivii-table-row-hover);
+  --n-table-color-striped: var(--kivii-table-row-striped);
+  color: var(--kivii-table-text);
+}
+
+:deep(.n-data-table-th) {
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+:deep(.n-data-table-th),
+:deep(.n-data-table-td) {
+  border-color: var(--kivii-table-border) !important;
 }
 
 :deep(.n-data-table-base-table-body) {
@@ -515,11 +588,11 @@ function getTagColor(type: string) {
   min-width: 100%;
 }
 
-/*:deep(.n-data-table__pagination) {*/
-/*  position: fixed;*/
-/*  bottom: 12px;*/
-/*  right: 12px;*/
-/*}*/
+/* 表格主体贴合卡片左右边缘，分页操作区单独保留呼吸空间 */
+:deep(.n-data-table__pagination) {
+  padding: 0 12px;
+  box-sizing: border-box;
+}
 
 /* 优化分页器页码选择器的样式 */
 :deep(.n-pagination .n-pagination-size-picker) {
@@ -535,6 +608,7 @@ function getTagColor(type: string) {
   display: flex;
   align-items: center;
   gap: 8px;
+  color: var(--kivii-table-muted);
 }
 
 /* 确保总条数显示正常 */
@@ -587,22 +661,22 @@ function getTagColor(type: string) {
   background-color: v-bind(fixedHeaderBg) !important;
   position: sticky !important;
   z-index: 3 !important;
-  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.12) !important;
+  box-shadow: 2px 0 4px rgba(15, 23, 42, 0.08) !important;
 }
 
 :deep(.n-data-table-th--fixed-right) {
   background-color: v-bind(fixedHeaderBg) !important;
   position: sticky !important;
   z-index: 3 !important;
-  box-shadow: -2px 0 4px rgba(0, 0, 0, 0.12) !important;
+  box-shadow: -2px 0 4px rgba(15, 23, 42, 0.08) !important;
 }
 
 :deep(.n-data-table-td--fixed-left) {
-  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 2px 0 4px rgba(15, 23, 42, 0.05) !important;
 }
 
 :deep(.n-data-table-td--fixed-right) {
-  box-shadow: -2px 0 4px rgba(0, 0, 0, 0.08) !important;
+  box-shadow: -2px 0 4px rgba(15, 23, 42, 0.05) !important;
 }
 
 /* 条纹行、悬停行的固定列也保持实色背景 */

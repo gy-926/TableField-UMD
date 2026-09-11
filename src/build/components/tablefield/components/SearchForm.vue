@@ -581,7 +581,7 @@ const handleViewAction = async (key: string, viewIndex?: number) => {
 </script>
 
 <template>
-  <NCard class="search-card" :bordered="false" content-style="padding: 12px;">
+  <NCard class="search-card" :bordered="true" content-style="padding: 14px 16px;">
     <!-- 顶部配置按钮区域 -->
     <div class="top-actions">
       <div class="tabs-container" style="display: flex; align-items: center; flex: 1; margin-right: 10px">
@@ -805,7 +805,11 @@ const handleViewAction = async (key: string, viewIndex?: number) => {
 
 <style scoped>
 .search-card {
-  margin-bottom: 8px;
+  margin-bottom: 12px;
+  overflow: hidden;
+  border-radius: 1rem;
+  border-color: var(--kivii-table-border);
+  background: var(--kivii-table-surface);
 }
 
 /* 自定义动作样式 */
@@ -814,7 +818,8 @@ const handleViewAction = async (key: string, viewIndex?: number) => {
   align-items: center;
   background-color: var(--n-color-action);
   padding: 6px 12px;
-  border-radius: 4px;
+  border: 1px solid var(--kivii-table-border);
+  border-radius: 6px;
   margin-top: 8px;
   gap: 12px;
   animation: fadeIn 0.3s ease;

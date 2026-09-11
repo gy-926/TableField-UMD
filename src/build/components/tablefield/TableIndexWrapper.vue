@@ -40,7 +40,32 @@ provide('primaryColor', primaryColor)
 
 <style scoped>
 .kivii-demo-lib-wrapper {
-  font-family: inherit;
-  color: var(--color-text);
+  --kivii-table-page-bg: #f5f7fb;
+  --kivii-table-surface: #ffffff;
+  --kivii-table-header-bg: #f5f7fa;
+  --kivii-table-row-hover: #f5f7ff;
+  --kivii-table-row-striped: #fafbfc;
+  --kivii-table-border: #e5e7eb;
+  --kivii-table-text: #374151;
+  --kivii-table-muted: #6b7280;
+
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  box-sizing: border-box;
+  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  color: var(--kivii-table-text);
+  background: var(--kivii-table-page-bg);
+}
+
+:global(.dark) .kivii-demo-lib-wrapper {
+  --kivii-table-page-bg: #111827;
+  --kivii-table-surface: #182235;
+  --kivii-table-header-bg: #202c40;
+  --kivii-table-row-hover: #22304a;
+  --kivii-table-row-striped: #1c283d;
+  --kivii-table-border: #344258;
+  --kivii-table-text: #e5e7eb;
+  --kivii-table-muted: #9ca3af;
 }
 </style>

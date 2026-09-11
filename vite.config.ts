@@ -28,6 +28,11 @@ const registryFooter = `
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  // Naive UI 的浏览器产物包含开发环境判断。UMD 以经典 script 方式运行，
+  // 浏览器中不存在 Node.js 的 process，因此必须在构建阶段替换为常量。
+  define: {
+    "process.env.NODE_ENV": JSON.stringify("production"),
+  },
   plugins: [
     vue(),
     Components({ dts: "src/types/components.d.ts", resolvers: [NaiveUiResolver()] }),

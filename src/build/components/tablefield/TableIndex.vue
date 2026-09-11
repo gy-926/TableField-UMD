@@ -1960,6 +1960,12 @@ provide('tableMethods', {
 <style scoped>
 .table-container {
   width: 100%;
+  height: 100%;
+  min-height: 0;
   position: relative;
+  box-sizing: border-box;
+  padding: 24px;
+  overflow: hidden;
+  background: var(--kivii-table-page-bg);
 }
 </style>

@@ -76,13 +76,66 @@ export function useTheme() {
   // 将 primaryColor 注入 NaiveUI themeOverrides
   const themeOverrides = computed(() => {
     const c = primaryColor.value
+    const dark = isDark.value
+    const surfaceColor = dark ? '#182235' : '#ffffff'
+    const headerColor = dark ? '#202c40' : '#f5f7fa'
+    const borderColor = dark ? '#344258' : '#e5e7eb'
+    const textColor = dark ? '#e5e7eb' : '#374151'
+    const mutedTextColor = dark ? '#9ca3af' : '#6b7280'
+    const hoverColor = dark ? '#22304a' : '#f5f7ff'
+    const stripedColor = dark ? '#1c283d' : '#fafbfc'
+
     return {
       common: {
         primaryColor: c,
         primaryColorHover: lighten(c, 0.2),
         primaryColorPressed: darken(c, 0.1),
         primaryColorSuppl: lighten(c, 0.1),
-      }
+        borderRadius: '1rem',
+        borderRadiusSmall: '8px',
+        dividerColor: borderColor,
+        textColorBase: textColor,
+        textColor2: textColor,
+        textColor3: mutedTextColor,
+      },
+      Card: {
+        color: surfaceColor,
+        borderColor,
+        borderRadius: '1rem',
+        boxShadow: dark
+          ? '0 1px 2px rgba(0, 0, 0, 0.24)'
+          : '0 1px 2px rgba(15, 23, 42, 0.04)',
+      },
+      DataTable: {
+        borderRadius: '1rem',
+        borderColor,
+        thColor: headerColor,
+        thColorHover: hoverColor,
+        thColorSorting: hoverColor,
+        tdColor: surfaceColor,
+        tdColorHover: hoverColor,
+        tdColorSorting: hoverColor,
+        tdColorStriped: stripedColor,
+        thTextColor: textColor,
+        tdTextColor: textColor,
+        thFontWeight: '600',
+        fontSizeSmall: '13px',
+        thPaddingSmall: '10px 12px',
+        tdPaddingSmall: '9px 12px',
+        paginationMargin: '12px 0 4px 0',
+      },
+      Input: {
+        heightSmall: '32px',
+        borderRadius: '8px',
+      },
+      Button: {
+        heightSmall: '32px',
+        borderRadiusSmall: '8px',
+      },
+      Pagination: {
+        itemBorderRadius: '8px',
+        itemSizeSmall: '30px',
+      },
     }
   })
 
